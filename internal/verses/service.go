@@ -173,9 +173,13 @@ func (s *service) findVerses(book string, verses []string, version internal.Vers
 		b := tx.Bucket([]byte(version)).Bucket([]byte(book))
 		for _, k := range verses {
 			content := b.Get([]byte(k))
+			cv := strings.Split(k, ":")
 			verse := internal.Verse{
-				DisplayName: fmt.Sprintf("%s %s", displayBook, string(k)),
+				DisplayName: fmt.Sprintf("%s %s", displayBook, k),
 				Content:     string(content),
+				Book:        book,
+				Chapter:     cv[0],
+				Verse:       cv[1],
 				Version:     version,
 			}
 			res = append(res, verse)
@@ -196,9 +200,14 @@ func (s *service) findBook(book string, version internal.Version) ([]internal.Ve
 	err := s.db.View(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte(version)).Bucket([]byte(book))
 		b.ForEach(func(k, v []byte) error {
+			key := string(k)
+			cv := strings.Split(key, ":")
 			verse := internal.Verse{
-				DisplayName: fmt.Sprintf("%s %s", displayBook, string(k)),
+				DisplayName: fmt.Sprintf("%s %s", displayBook, key),
 				Content:     string(v),
+				Book:        book,
+				Chapter:     cv[0],
+				Verse:       cv[1],
 				Version:     version,
 			}
 			verses = append(verses, verse)

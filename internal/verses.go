@@ -5,6 +5,9 @@ import "errors"
 type Verse struct {
 	DisplayName string  `json:"displayName"`
 	Content     string  `json:"content"`
+	Book        string  `json:"book"`
+	Chapter     string  `json:"chapter"`
+	Verse       string  `json:"verse"`
 	Version     Version `json:"version"` //TODO versions
 }
 
