@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"strconv"
 	"strings"
 
 	"github.com/boltdb/bolt"
@@ -54,13 +55,19 @@ func loadBook(name string, db *bolt.DB) {
 	if err != nil {
 		logrus.WithError(err).WithField("version", version).Fatal("unable to create version bucket")
 	}
+
+	endBucket, err := vbucket.CreateBucketIfNotExists([]byte("versecount"))
 	for book, chapterMap := range bible {
 		bbucket, err := vbucket.CreateBucketIfNotExists([]byte(book))
 		if err != nil {
 			logrus.WithError(err).WithField("book", book).Fatal("unable to create book bucket")
 		}
+
 		for chapter, verseMap := range chapterMap.(map[string]interface{}) {
-			for verse, content := range verseMap.(map[string]interface{}) {
+			vm := verseMap.(map[string]interface{})
+			endKey := fmt.Sprintf("%s:%s", book, chapter)
+			endBucket.Put([]byte(endKey), []byte(strconv.Itoa(len(vm))))
+			for verse, content := range vm {
 				contentText := content.(string)
 				key := fmt.Sprintf("%s:%s", chapter, verse)
 				bbucket.Put([]byte(key), []byte(contentText))
