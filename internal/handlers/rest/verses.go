@@ -26,6 +26,7 @@ func NewVerseHandler(mr *mux.Router, service internal.VerseService) http.Handler
 
 func (h *verseHandler) FindAll(w http.ResponseWriter, r *http.Request) {
 	params := r.URL.Query()
+
 	q, ok := params["q"]
 	if !ok {
 		EncodeError(w, http.StatusBadRequest, "verse", "missing query param", "findall")
