@@ -30,4 +30,4 @@ jobs:
         run: "docker push us.gcr.io/${{ secrets.GCLOUD_PROJECT }}/lectionary:$(git rev-parse --short HEAD)"
 
       - name: Install beta commands and deploy on cloud run
-        run: "gcloud components install beta --quiet && gcloud beta run deploy lectionary --image us.gcr.io/${{ secrets.GCLOUD_PROJECT }}/lectionary:$(git rev-parse --short HEAD) --project ${{ secrets.GCLOUD_PROJECT }} --region us-east1 --platform managed"
+        run: "gcloud components install beta --quiet && gcloud beta run deploy lectionary --image us.gcr.io/${{ secrets.GCLOUD_PROJECT }}/lectionary:$(git rev-parse --short HEAD) --project ${{ secrets.GCLOUD_PROJECT }} --region us-east1 --platform managed --memory=1Gi"
