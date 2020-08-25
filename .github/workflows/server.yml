@@ -1,0 +1,32 @@
+name: Lectionary API
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v1
+
+      - name: Authenticate into Google Cloud Platform
+        uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
+        with:
+          version: '270.0.0'
+          service_account_email: ${{ secrets.GCP_SA_EMAIL }}
+          service_account_key: ${{ secrets.GCLOUD_AUTH }}
+
+      - name: Build the Docker image
+        run: docker build . --file Dockerfile --tag us.gcr.io/${{ secrets.GCLOUD_PROJECT }}/lectionary:$(git rev-parse --short HEAD) --target prod
+
+      - name: Configure Docker to use Google Cloud Platform
+        run: "gcloud auth configure-docker --quiet"
+
+      - name: Push image to Google Cloud Container Registry
+        run: "docker push us.gcr.io/${{ secrets.GCLOUD_PROJECT }}/lectionary:$(git rev-parse --short HEAD)"
+
+      - name: Install beta commands and deploy on cloud run
+        run: "gcloud components install beta --quiet && gcloud beta run deploy lectionary --quiet --image us.gcr.io/${{ secrets.GCLOUD_PROJECT }}/lectionary:$(git rev-parse --short HEAD) --project ${{ secrets.GCLOUD_PROJECT }} --region us-east1 --platform managed"
