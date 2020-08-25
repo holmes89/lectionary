@@ -15,10 +15,11 @@ jobs:
       - name: Authenticate into Google Cloud Platform
         uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
         with:
-          version: '270.0.0'
+          version: '290.0.1'
           service_account_email: ${{ secrets.GCP_SA_EMAIL }}
           service_account_key: ${{ secrets.GCLOUD_AUTH }}
-
+          export_default_credentials: true
+          
       - name: Build the Docker image
         run: docker build . --file Dockerfile --tag us.gcr.io/${{ secrets.GCLOUD_PROJECT }}/lectionary:$(git rev-parse --short HEAD) --target prod
 
